@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống phân loại Email Spam | Khóa luận tốt nghiệp</title>
+    <!-- Font Inter & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fa-solid fa-shield-cat"></i>
+                </div>
+                <div class="header-titles">
+                    <h1>Hệ thống phân loại Email Spam</h1>
+                    <p class="subtitle">Phát hiện Email Spam bằng Machine Learning</p>
+                    <div class="badges-row">
+                        <span class="badge badge-info"><i class="fa-solid fa-database"></i> Tập dữ liệu SpamAssassin</span>
+                        <span class="badge badge-info"><i class="fa-solid fa-code-compare"></i> Trích xuất đặc trưng TF-IDF</span>
+                        <span class="badge badge-info"><i class="fa-solid fa-brain"></i> Học máy (Machine Learning)</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOP GRID: UPLOAD & MODEL SELECTION -->
+        <div class="top-grid">
+            <!-- UPLOAD CARD -->
+            <div class="card upload-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-cloud-arrow-up"></i> Tải lên Email</h2>
+                    <span class="sub-text">Hỗ trợ định dạng file <code>.eml</code>. Có thể tải lên một hoặc nhiều Email.</span>
+                </div>
+                
+                <div class="drop-zone" id="dropZone">
+                    <input type="file" id="fileInput" multiple accept=".eml" class="file-input">
+                    <div class="drop-zone-content">
+                        <i class="fa-solid fa-envelope-circle-check drop-icon"></i>
+                        <p class="drop-title">Kéo thả file <strong>.eml</strong> vào đây</p>
+                        <p class="drop-sub">hoặc bấm để chọn file</p>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('fileInput').click()">
+                            <i class="fa-solid fa-folder-open"></i> Chọn file
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SELECTED FILES LIST -->
+                <div class="selected-files-container" id="selectedFilesContainer" style="display: none;">
+                    <div class="files-list-header">
+                        <span>Các Email đã chọn (<span id="fileCount">0</span>)</span>
+                        <button type="button" class="btn-text text-danger" id="clearFilesBtn">
+                            <i class="fa-solid fa-trash-can"></i> Xóa tất cả
+                        </button>
+                    </div>
+                    <ul class="files-list" id="filesList"></ul>
+                </div>
+            </div>
+
+            <!-- MODEL SELECTION CARD -->
+            <div class="card model-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-sliders"></i> Chọn mô hình phân loại</h2>
+                    <span class="sub-text">Lựa chọn các thuật toán phân loại thử nghiệm</span>
+                </div>
+
+                <div class="model-options">
+                    <label class="model-option-card active" id="opt-all">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="model-all" checked>
+                            <span class="custom-checkbox"></span>
+                        </div>
+                        <div class="model-info">
+                            <div class="model-name">Tất cả mô hình</div>
+                            <div class="model-desc">Chạy đồng thời Naive Bayes + KNN + Decision Tree</div>
+                        </div>
+                    </label>
+
+                    <div class="individual-models">
+                        <label class="model-option-card active" id="opt-nb">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="model-nb" value="naive_bayes" checked>
+                                <span class="custom-checkbox"></span>
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">Naive Bayes</div>
+                                <div class="model-desc">Mô hình phân loại xác suất (Multinomial Naive Bayes)</div>
+                            </div>
+                        </label>
+
+                        <label class="model-option-card active" id="opt-knn">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="model-knn" value="knn" checked>
+                                <span class="custom-checkbox"></span>
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">K-Nearest Neighbors (KNN)</div>
+                                <div class="model-desc">Phân loại dựa trên khoảng cách láng giềng</div>
+                            </div>
+                        </label>
+
+                        <label class="model-option-card active" id="opt-dt">
+                            <div class="checkbox-wrapper">
+                                <input type="checkbox" id="model-dt" value="decision_tree" checked>
+                                <span class="custom-checkbox"></span>
+                            </div>
+                            <div class="model-info">
+                                <div class="model-name">Decision Tree</div>
+                                <div class="model-desc">Phân loại dựa trên cây quyết định</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ANALYZE BUTTON -->
+                <button id="analyzeBtn" class="btn btn-primary btn-block" disabled>
+                    <i class="fa-solid fa-microchip"></i> <span id="analyzeBtnText">Phân tích Email</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- EMPTY STATE (Shown before analysis) -->
+        <div class="card empty-state-card" id="emptyStateCard">
+            <div class="empty-state-content">
+                <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
+                <h3>Chưa có kết quả phân tích</h3>
+                <p>Tải lên file Email (<code>.eml</code>) và bấm <strong>"Phân tích Email"</strong> để bắt đầu thử nghiệm.</p>
+            </div>
+        </div>
+
+        <!-- RESULTS SECTION -->
+        <section class="results-section" id="resultsSection" style="display: none;">
+            <!-- SUMMARY DASHBOARD CARD -->
+            <div class="card summary-card" id="summaryCard">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-chart-pie"></i> Tổng quan kết quả</h2>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-box box-total">
+                        <span class="metric-value" id="metricTotal">0</span>
+                        <span class="metric-label">Tổng số Email</span>
+                    </div>
+                    <div class="metric-box box-spam">
+                        <span class="metric-value" id="metricSpam">0</span>
+                        <span class="metric-label">Tổng SPAM</span>
+                    </div>
+                    <div class="metric-box box-ham">
+                        <span class="metric-value" id="metricHam">0</span>
+                        <span class="metric-label">Tổng HAM</span>
+                    </div>
+                    <div class="metric-box box-agreement" id="agreementBox">
+                        <span class="metric-value" id="metricAgreement">--</span>
+                        <span class="metric-label">Mức độ đồng thuận</span>
+                    </div>
+                </div>
+
+                <div class="model-breakdown-row" id="modelBreakdownRow"></div>
+            </div>
+
+            <!-- MAIN ANALYSIS RESULTS CARD -->
+            <div class="card results-display-card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-list-check"></i> Kết quả phân tích</h2>
+                    <span class="sub-text">Nhấp vào một dòng trong bảng để xem chi tiết Email.</span>
+                </div>
+
+                <!-- BATCH TABLE VIEW -->
+                <div class="table-responsive" id="tableViewContainer">
+                    <table class="results-table" id="resultsTable">
+                        <thead>
+                            <tr id="tableHeaderRow">
+                                <th>Tên file</th>
+                                <th>Tiêu đề</th>
+                                <!-- Dynamic Model Headers -->
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- SINGLE EMAIL RESULT CARDS -->
+                <div class="single-cards-container" id="singleCardsContainer" style="display: none;"></div>
+            </div>
+
+            <!-- EMAIL DETAIL VIEW PANEL -->
+            <div class="card detail-card" id="detailCard" style="display: none;">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-file-lines"></i> Chi tiết Email</h2>
+                    <button class="btn-icon" id="closeDetailBtn" title="Đóng panel"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="detail-body">
+                    <div class="detail-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Tên file:</span>
+                            <span class="meta-val" id="detailFilename">--</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Tiêu đề:</span>
+                            <span class="meta-val" id="detailSubject">--</span>
+                        </div>
+                        <div class="meta-item" id="detailAgreementWrapper">
+                            <span class="meta-label">Mức độ đồng thuận:</span>
+                            <span class="meta-val badge badge-neutral" id="detailAgreement">--</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-predictions-grid" id="detailPredictionsGrid"></div>
+
+                    <!-- COLLAPSIBLE PROCESSED TEXT -->
+                    <div class="collapsible-section">
+                        <button class="collapsible-trigger" id="toggleProcessedBtn">
+                            <span><i class="fa-solid fa-code"></i> Xem nội dung đã tiền xử lý</span>
+                            <i class="fa-solid fa-chevron-down toggle-icon" id="toggleIcon"></i>
+                        </button>
+                        <div class="collapsible-content" id="processedTextContent" style="display: none;">
+                            <p class="text-explanation">
+                                Chuỗi văn bản sau khi chuyển chữ thường, lọc thẻ HTML, gỡ URL/Email, loại bỏ ký tự đặc biệt, chuẩn hóa khoảng trắng và loại bỏ từ dừng tiếng Anh (stopwords):
+                            </p>
+                            <pre class="preprocessed-code" id="preprocessedTextCode"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- THESIS EXPERIMENT INFO CARD -->
+        <div class="card about-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> Thông tin thực nghiệm</h2>
+            </div>
+            <ul class="experiment-info-list">
+                <li><strong>Tập dữ liệu:</strong> SpamAssassin Public Corpus</li>
+                <li><strong>Trích xuất đặc trưng:</strong> TF-IDF Vectorization (~168.495 đặc trưng)</li>
+                <li><strong>Các mô hình phân loại:</strong> Naive Bayes, K-Nearest Neighbors (KNN), Decision Tree</li>
+                <li><strong>Mục tiêu:</strong> So sánh hiệu quả của các thuật toán học máy trong bài toán phân loại email Spam/Ham.</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
