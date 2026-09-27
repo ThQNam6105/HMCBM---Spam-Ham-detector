@@ -12,24 +12,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+    <!-- FIXED FULL-WIDTH HEADER -->
+    <header class="app-header">
+        <div class="header-container">
+            <h1>HỆ THỐNG PHÁT HIỆN MAIL SPAM BẰNG MACHINE LEARNING</h1>
+            <p class="subtitle">NHÓM 5 | HỌC MÁY CHO BẢO MẬT</p>
+        </div>
+    </header>
+
     <div class="app-container">
-        <!-- HEADER -->
-        <header class="app-header">
-            <div class="header-content">
-                <div class="header-icon">
-                    <i class="fa-solid fa-shield-cat"></i>
-                </div>
-                <div class="header-titles">
-                    <h1>Hệ thống phân loại Email Spam</h1>
-                    <p class="subtitle">Phát hiện Email Spam bằng Machine Learning</p>
-                    <div class="badges-row">
-                        <span class="badge badge-info"><i class="fa-solid fa-database"></i> Tập dữ liệu SpamAssassin</span>
-                        <span class="badge badge-info"><i class="fa-solid fa-code-compare"></i> Trích xuất đặc trưng TF-IDF</span>
-                        <span class="badge badge-info"><i class="fa-solid fa-brain"></i> Học máy (Machine Learning)</span>
-                    </div>
-                </div>
-            </div>
-        </header>
 
         <!-- TOP GRID: UPLOAD & MODEL SELECTION -->
         <div class="top-grid">

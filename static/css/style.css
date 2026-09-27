@@ -46,7 +46,7 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.6;
-    padding: 24px 16px;
+    padding: 100px 16px 32px 16px;
     font-size: 15px;
 }
 
@@ -57,49 +57,41 @@ body {
 }
 
 /* -------------------------------------------------------------
-   HEADER
+   FIXED FULL-WIDTH HEADER
 ------------------------------------------------------------- */
 .app-header {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    padding: 24px 32px;
-    margin-bottom: 24px;
-    box-shadow: var(--shadow-sm);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: #ffffff;
+    border-bottom: 2px solid var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 14px 24px;
+    text-align: center;
 }
 
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+.header-container {
+    max-width: 1280px;
+    margin: 0 auto;
 }
 
-.header-icon {
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: #ffffff;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-    flex-shrink: 0;
-}
-
-.header-titles h1 {
-    font-size: 26px;
+.app-header h1 {
+    font-size: 20px;
     font-weight: 800;
     color: var(--text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
 }
 
-.header-titles .subtitle {
-    font-size: 15px;
-    color: var(--text-secondary);
-    margin-top: 2px;
-    font-weight: 500;
+.app-header .subtitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary-color);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .badges-row {
